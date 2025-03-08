@@ -1,8 +1,24 @@
 import jwt from "jsonwebtoken";
 import prisma from "../lib/prisma.js";
 
+// import { PrismaClient } from '@prisma/client';
+
+// const prisma = new PrismaClient();
+
+// // Hook to log before the connection is made
+// prisma.$on('beforeConnect', () => {
+//   console.log('Attempting to connect to the database...');
+// });
+
+// // Hook to log after the connection is established
+// prisma.$on('afterConnect', () => {
+//   console.log('Successfully connected to the database!');
+// });
+
 export const getPosts = async (req, res) => {
     const query = req.query;
+
+    console.log("Get posts");
 
     try {
         const posts = await prisma.post.findMany({
@@ -17,6 +33,9 @@ export const getPosts = async (req, res) => {
                 },
             },
         });
+
+        console.log(posts);
+
         res.status(200).json(posts);
     } catch (err) {
         console.log(err);
