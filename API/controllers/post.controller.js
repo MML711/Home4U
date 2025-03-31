@@ -1,20 +1,6 @@
 import jwt from "jsonwebtoken";
 import prisma from "../lib/prisma.js";
 
-// import { PrismaClient } from '@prisma/client';
-
-// const prisma = new PrismaClient();
-
-// // Hook to log before the connection is made
-// prisma.$on('beforeConnect', () => {
-//   console.log('Attempting to connect to the database...');
-// });
-
-// // Hook to log after the connection is established
-// prisma.$on('afterConnect', () => {
-//   console.log('Successfully connected to the database!');
-// });
-
 export const getPosts = async (req, res) => {
     const query = req.query;
 
@@ -24,7 +10,7 @@ export const getPosts = async (req, res) => {
         const posts = await prisma.post.findMany({
             where: {
                 city: query.city || undefined,
-                type: query.type || undefined,
+                type: query.type != "any" ? query.type : undefined,
                 property: query.property || undefined,
                 bedroom: parseInt(query.bedroom) || undefined,
                 price: {
@@ -73,12 +59,16 @@ export const getPost = async (req, res) => {
                             },
                         },
                     });
-                    res.status(200).json({...post, isSaved: saved ? true : false});
+                    return res.status(200).json({...post, isSaved: saved ? true : false});  // Ensure you return after sending the response
                 }
+                // Handle the error case for JWT verification (optional)
+                return res.status(200).json({...post, isSaved: false});  // Default response if token verification fails
             });
+        } else {
+            // If there is no token, send the response immediately
+            return res.status(200).json({...post, isSaved: false});
         }
 
-        res.status(200).json({...post, isSaved: false});
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: "Failed to get post!" });
@@ -88,6 +78,9 @@ export const getPost = async (req, res) => {
 export const addPost = async (req, res) => {
     const body = req.body;
     const tokenUserId = req.userId;
+
+    console.log(body);
+    
 
     try {
         const newPost = await prisma.post.create({

@@ -9,12 +9,13 @@ import apiRequest from "../../lib/apiRequest";
 
 function SinglePage() {
   const post = useLoaderData();
-  const [saved, setSaved] = useState(post.isSaved);
+  const [saved, setSaved] = useState(post.isSaved);  
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSave = async () => {
     setSaved(prev => !prev);
+    console.log(saved);
 
     if (!currentUser) {
       navigate("/login");
@@ -44,7 +45,7 @@ function SinglePage() {
                 <div className="price">$ {post.price}</div>
               </div>
               <div className="user">
-                <img src={post.user.avatar} alt="" />
+                <img src={post.user.avatar || "/noavatar.jpg"} alt="" />
                 <span>{post.user.username}</span>
               </div>
             </div>
